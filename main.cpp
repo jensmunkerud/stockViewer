@@ -1,4 +1,4 @@
-#include <Adafruit_SSD1306.h>									 //Include the required libraries
+#include <Adafruit_SSD1306.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <NTPClient.h> 
@@ -35,21 +35,6 @@ std::map<string, const String> tickerURL = {{"AAPL" , "https://finnhub.io/api/v1
 											{"NVDA", "https://finnhub.io/api/v1/quote/?symbol=NVDA&token=cqhrmcpr01qgbqu5ue80cqhrmcpr01qgbqu5ue8g"}
 											};
 
-class Stock {
-	public:
-	string ticker;
-	string price;
-	string hi;
-	string lo;
-	string change;
-	Stock(string Iticker, string Iprice, string Ihi, string Ilo, string Ichange) {
-		ticker = Iticker;
-		price = Iprice;
-		hi = Ihi;
-		lo = Ilo;
-		change = Ichange;
-	}
-};
 
 // Nordnet logo 128x64px WHITE
 const unsigned char flashLogo [] PROGMEM = {
@@ -133,23 +118,23 @@ void printCenter(const String buf, int x, int y)			//Function to centre the curr
 	display.print(buf);										//Display string
 }
 
-void displayStock(Stock data, string time) {
+void displayStock(string ticker, string price, string time) {
 	display.clearDisplay();								 //Clear the OLED display
 	display.setTextSize(2);
-	printCenter(data.price.c_str(), 0, 20);
+	printCenter(price.c_str(), 0, 20);
 	display.setTextSize(1);
-	printCenter(data.ticker.c_str(), 0, 0);
+	printCenter(ticker.c_str(), 0, 0);
 	printCenter(time.c_str(), 48, 0);
-	display.setCursor(0, 54);
-	display.print(("hi: " + data.hi).c_str());
-	display.setCursor(20, 54);
-	display.print(("lo: " + data.lo).c_str());
-	display.setCursor(30, 54);
-	display.print(("change: " + data.change + "%").c_str());
+	// display.setCursor(0, 54);
+	// display.print(("hi: " + data.hi).c_str());
+	// display.setCursor(20, 54);
+	// display.print(("lo: " + data.lo).c_str());
+	// display.setCursor(30, 54);
+	// display.print(("change: " + data.change + "%").c_str());
 	display.display();
 }
 
-Stock fetchData(string ticker) {
+string fetchData(string ticker) {
 	http.begin(tickerURL[ticker]);
 	int httpCode = http.GET();
 	StaticJsonDocument<2000> doc;
@@ -157,17 +142,15 @@ Stock fetchData(string ticker) {
  
 	if (error)
 	{
-		Stock result(ticker, "error", "0", "0", "0");
-		return result;
+		return "error";
 	}
 	http.end();
 	string price = doc["c"].as<string>();
-	string hi = doc["h"].as<string>();
-	string lo = doc["l"].as<string>();
-	string change = doc["dp"].as<string>();
+	// string hi = doc["h"].as<string>();
+	// string lo = doc["l"].as<string>();
+	// string change = doc["dp"].as<string>();
 
-	Stock result(ticker, price, hi, lo, change);
-	return result;
+	return price;
 }
 
 void setup() 
@@ -211,7 +194,7 @@ void setup()
 void loop() 
 {
 	for (string ticker : tickers) {
-		displayStock(fetchData(ticker), getCurrentTime());
+		displayStock(ticker, fetchData(ticker), getCurrentTime());
 		delay(stockDisplayTime);
 	}
 	esp_sleep_enable_timer_wakeup(900000000);			 //Sleep for 15 minutes
