@@ -4,7 +4,6 @@
 #include <NTPClient.h> 
 #include <WiFiUdp.h>
 #include <ArduinoJson.h>
-#include <iostream>
 #include <map>
 using namespace std;
 
@@ -12,10 +11,9 @@ using namespace std;
 #define SCREEN_HEIGHT 64
 #define OLED_RESET		 -1
 #define SCREEN_ADDRESS 0x3C
-Adafruit_SSD1306 display (SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);		//Create the display object
-const char* ssid = "Forlenger";
-const char* password = "12345678";
-// std::map<const char*, const char*> networks = {{"Forlenger" , "12345678"}, {"Utsikten", "Mitthemmeligepassord"}};
+Adafruit_SSD1306 display (SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+const char* ssid = "SSID";
+const char* password = "PASS";
 int stockDisplayTime = 5000;
 string tickers[4] = {"TSLA", "NVDA", "AAPL", "MSFT"};
 
@@ -29,10 +27,11 @@ NTPClient timeClient(udp, ntpServer, gmtOffset_sec, 60000);  // Update every 60 
 WiFiClient client;
 HTTPClient http;
 
-std::map<string, const String> tickerURL = {{"AAPL" , "https://finnhub.io/api/v1/quote/?symbol=AAPL&token=cqhrmcpr01qgbqu5ue80cqhrmcpr01qgbqu5ue8g"},
-											{"TSLA", "https://finnhub.io/api/v1/quote/?symbol=TSLA&token=cqhrmcpr01qgbqu5ue80cqhrmcpr01qgbqu5ue8g"},
-											{"MSFT", "https://finnhub.io/api/v1/quote/?symbol=MSFT&token=cqhrmcpr01qgbqu5ue80cqhrmcpr01qgbqu5ue8g"},
-											{"NVDA", "https://finnhub.io/api/v1/quote/?symbol=NVDA&token=cqhrmcpr01qgbqu5ue80cqhrmcpr01qgbqu5ue8g"}
+// The links has to be const for http get requests to work, idealy get around this so the finnhub link can be dynamic
+std::map<string, const String> tickerURL = {{"AAPL" , "https://finnhub.io/api/v1/quote/?symbol=AAPL&token=YOURTOKENHERE"},
+											{"TSLA", "https://finnhub.io/api/v1/quote/?symbol=TSLA&token=YOURTOKENHERE"},
+											{"MSFT", "https://finnhub.io/api/v1/quote/?symbol=MSFT&token=YOURTOKENHERE"},
+											{"NVDA", "https://finnhub.io/api/v1/quote/?symbol=NVDA&token=YOURTOKENHERE"}
 											};
 
 
